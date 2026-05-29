@@ -50,6 +50,7 @@ export class DebatePartnerView extends ItemView {
 			const itemDiv = listDiv.createEl("div", { cls: "debate-argument-item" });
 			
 			const headerDiv = itemDiv.createEl("div", { cls: "debate-argument-header" });
+			headerDiv.createEl("span", { cls: `debate-indicator debate-indicator-${arg.severity.toLowerCase()}` });
 			headerDiv.createEl("span", { 
 				text: arg.severity.toUpperCase(), 
 				cls: `debate-severity debate-severity-${arg.severity.toLowerCase()}` 
