@@ -94,6 +94,15 @@ export default class DebatePartnerPlugin extends Plugin {
 		try {
 			const response = await client.generateCounterarguments(thesis_junk, contextNotes);
 			new Notice("Debate Partner: Counterarguments generated successfully!");
+			
+			const args = this.parseOllamaResponse(response);
+			await this.activateView();
+
+			const leaf = this.app.workspace.getLeavesOfType(DEBATE_PARTNER_VIEW_TYPE)[0];
+			if (leaf) {
+				const view = leaf.view as DebatePartnerView;
+				view.updateArguments(thesis_junk, args);
+			}
 		} catch (err) {
 			new Notice("Failed to communicate with Ollama. Is it running locally?");
 			console.error(err);
