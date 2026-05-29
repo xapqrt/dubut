@@ -1,4 +1,5 @@
 import { Plugin, Notice } from "obsidian";
+import { TfidfEngine } from "./search";
 
 interface DebatePartnerSettings {
 	ollamaUrl: string;
@@ -59,5 +60,19 @@ export default class DebatePartnerPlugin extends Plugin {
 		}
 		new Notice(`Challenging: "${thesis_junk.substring(0, 30)}..."`);
 		console.log("editor api is grabbing the highlighted text: ", thesis_junk);
+
+		const engine = new TfidfEngine(this.app);
+		const matches = await engine.search(thesis_junk, 5);
+		console.log("matching notes found:", matches.length);
+		
+		if (matches.length === 0) {
+			new Notice("No matching notes found in the vault to argue with.");
+			return;
+		}
+
+		new Notice(`Found ${matches.length} relevant notes!`);
+		for (const match of matches) {
+			console.log(`Match: ${match.file.path} (score: ${match.score.toFixed(4)})`);
+		}
 	}
 }
