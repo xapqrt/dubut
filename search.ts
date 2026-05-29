@@ -36,8 +36,9 @@ export class TfidfEngine {
 
 	// helper to get all markdown files
 	public async crawlVault(): Promise<TFile[]> {
-		// placeholder for crawler logic
-		return [];
+		const files = this.app.vault.getMarkdownFiles();
+		console.log("vault files scanned:", files.length);
+		return files;
 	}
 
 
