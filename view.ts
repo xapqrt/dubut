@@ -57,9 +57,40 @@ export class DebatePartnerView extends ItemView {
 			});
 
 			const textP = itemDiv.createEl("p", { 
-				text: arg.argument,
 				cls: "debate-argument-text" 
 			});
+			this.renderArgumentWithLinks(textP, arg.argument);
+		}
+	}
+
+	private renderArgumentWithLinks(parentEl: HTMLElement, text: string) {
+		const regex = /\[\[(.*?)\]\]/g;
+		let lastIndex = 0;
+		let match;
+
+		while ((match = regex.exec(text)) !== null) {
+			const plainText = text.substring(lastIndex, match.index);
+			if (plainText) {
+				parentEl.appendChild(document.createTextNode(plainText));
+			}
+
+			const linkTarget = match[1];
+			const linkEl = parentEl.createEl("a", { 
+				text: linkTarget, 
+				cls: "internal-link debate-citation-link" 
+			});
+			linkEl.href = "#";
+			linkEl.addEventListener("click", async (e) => {
+				e.preventDefault();
+				await this.app.workspace.openLinkText(linkTarget, "", true);
+			});
+
+			lastIndex = regex.lastIndex;
+		}
+
+		const remainingText = text.substring(lastIndex);
+		if (remainingText) {
+			parentEl.appendChild(document.createTextNode(remainingText));
 		}
 	}
 
