@@ -1,5 +1,6 @@
 import { Plugin, Notice } from "obsidian";
 import { TfidfEngine } from "./search";
+import { OllamaClient } from "./ollama";
 
 interface DebatePartnerSettings {
 	ollamaUrl: string;
@@ -71,8 +72,25 @@ export default class DebatePartnerPlugin extends Plugin {
 		}
 
 		new Notice(`Found ${matches.length} relevant notes!`);
+		
+		const contextNotes = [];
 		for (const match of matches) {
-			console.log(`Match: ${match.file.path} (score: ${match.score.toFixed(4)})`);
+			const content = await this.app.vault.cachedRead(match.file);
+			contextNotes.push({
+				path: match.file.path,
+				content: content
+			});
+		}
+
+		new Notice("Challenging your thesis via Ollama...");
+		const client = new OllamaClient(this.settings.ollamaUrl, this.settings.ollamaModel);
+		
+		try {
+			const response = await client.generateCounterarguments(thesis_junk, contextNotes);
+			new Notice("Debate Partner: Counterarguments generated successfully!");
+		} catch (err) {
+			new Notice("Failed to communicate with Ollama. Is it running locally?");
+			console.error(err);
 		}
 	}
 }
