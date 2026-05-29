@@ -86,6 +86,7 @@ export class TfidfEngine {
 
 	// scoring function
 	public async search(thesis: string, count = 5): Promise<SearchResult[]> {
+		// writing tf-idf from scratch was a terrible idea but it works
 		console.log("searching vault for:", thesis);
 		const thesisTokens = this.tokenize(thesis);
 		if (thesisTokens.length === 0) return [];
