@@ -112,20 +112,20 @@ export default class DebatePartnerPlugin extends Plugin {
 	async activateView() {
 		const { workspace } = this.app;
 
-		let leaf = workspace.getLeavesOfType(DEBATE_PARTNER_VIEW_TYPE)[0];
-		if (!leaf) {
+		let the_sidebar = workspace.getLeavesOfType(DEBATE_PARTNER_VIEW_TYPE)[0];
+		if (!the_sidebar) {
 			const rightLeaf = workspace.getRightLeaf(false);
 			if (rightLeaf) {
 				await rightLeaf.setViewState({
 					type: DEBATE_PARTNER_VIEW_TYPE,
 					active: true,
 				});
-				leaf = rightLeaf;
+				the_sidebar = rightLeaf;
 			}
 		}
 
-		if (leaf) {
-			workspace.revealLeaf(leaf);
+		if (the_sidebar) {
+			workspace.revealLeaf(the_sidebar);
 		}
 	}
 
