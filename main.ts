@@ -119,4 +119,37 @@ export default class DebatePartnerPlugin extends Plugin {
 			workspace.revealLeaf(leaf);
 		}
 	}
+
+	private parseOllamaResponse(raw_text: string): DebateArgument[] {
+		console.log("OLLAMA RAW RES:", raw_text);
+		try {
+			let cleanText = raw_text.trim();
+			const jsonMatch = cleanText.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+			if (jsonMatch) {
+				cleanText = jsonMatch[1].trim();
+			}
+
+			const startIdx = cleanText.indexOf("[");
+			const endIdx = cleanText.lastIndexOf("]");
+			if (startIdx !== -1 && endIdx !== -1) {
+				cleanText = cleanText.substring(startIdx, endIdx + 1);
+			}
+
+			const parsed = JSON.parse(cleanText);
+			if (Array.isArray(parsed)) {
+				return parsed.map((item: any) => ({
+					argument: item.argument || "No argument provided.",
+					severity: item.severity || "Medium"
+				}));
+			}
+		} catch (e) {
+			console.error("Failed to parse Ollama response as JSON:", e);
+		}
+
+		// fallback to a dummy argument if everything fails
+		return [{
+			argument: "Failed to parse Ollama response: " + raw_text.substring(0, 100) + "...",
+			severity: "Medium"
+		}];
+	}
 }
