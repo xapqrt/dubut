@@ -14,8 +14,16 @@ export class TfidfEngine {
 
 	// tokenizer helper
 	public tokenize(text: string): string[] {
-		// placeholder for tokenizer logic
-		return [];
+		if (!text) return [];
+		
+		// clean, lower and regex out the garbage
+		const clean = text.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?"'\n\r]/g, " ");
+		const words = clean.split(/\s+/);
+		
+		// lazy list of stop words to filter out the noise
+		const stopwords = new Set(["the", "a", "and", "is", "in", "to", "of", "that", "it", "for", "on", "with", "as", "this", "but", "by", "are"]);
+		
+		return words.filter(w => w.length > 1 && !stopwords.has(w));
 	}
 
 
