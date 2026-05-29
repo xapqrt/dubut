@@ -1,6 +1,7 @@
 import { Plugin, Notice } from "obsidian";
 import { TfidfEngine } from "./search";
 import { OllamaClient } from "./ollama";
+import { DebatePartnerView, DEBATE_PARTNER_VIEW_TYPE } from "./view";
 
 interface DebatePartnerSettings {
 	ollamaUrl: string;
@@ -20,9 +21,14 @@ export default class DebatePartnerPlugin extends Plugin {
 		
 		await this.loadSettings();
 
+		this.registerView(
+			DEBATE_PARTNER_VIEW_TYPE,
+			(leaf) => new DebatePartnerView(leaf)
+		);
+
 		// Create ribbon icon
-		const ribbonIconEl = this.addRibbonIcon('swords', 'Debate Partner', (evt: MouseEvent) => {
-			console.log("ribbon clicked, but need editor selection for thesis_junk");
+		const ribbonIconEl = this.addRibbonIcon('swords', 'Debate Partner', async (evt: MouseEvent) => {
+			await this.activateView();
 		});
 		ribbonIconEl.addClass('debate-partner-ribbon-class');
 
@@ -91,6 +97,26 @@ export default class DebatePartnerPlugin extends Plugin {
 		} catch (err) {
 			new Notice("Failed to communicate with Ollama. Is it running locally?");
 			console.error(err);
+		}
+	}
+
+	async activateView() {
+		const { workspace } = this.app;
+
+		let leaf = workspace.getLeavesOfType(DEBATE_PARTNER_VIEW_TYPE)[0];
+		if (!leaf) {
+			const rightLeaf = workspace.getRightLeaf(false);
+			if (rightLeaf) {
+				await rightLeaf.setViewState({
+					type: DEBATE_PARTNER_VIEW_TYPE,
+					active: true,
+				});
+				leaf = rightLeaf;
+			}
+		}
+
+		if (leaf) {
+			workspace.revealLeaf(leaf);
 		}
 	}
 }
