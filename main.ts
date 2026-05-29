@@ -1,7 +1,7 @@
 import { Plugin, Notice } from "obsidian";
 import { TfidfEngine } from "./search";
 import { OllamaClient } from "./ollama";
-import { DebatePartnerView, DEBATE_PARTNER_VIEW_TYPE } from "./view";
+import { DebatePartnerView, DEBATE_PARTNER_VIEW_TYPE, DebateArgument } from "./view";
 
 interface DebatePartnerSettings {
 	ollamaUrl: string;
