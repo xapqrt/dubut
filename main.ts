@@ -27,6 +27,15 @@ export default class DebatePartnerPlugin extends Plugin {
 		// Status bar shows status
 		const statusBarItemEl = this.addStatusBarItem();
 		statusBarItemEl.setText('Debate Partner: Ready');
+
+		this.addCommand({
+			id: "challenge-my-thinking",
+			name: "Challenge My Thinking",
+			editorCallback: async (editor, view) => {
+				const selection = editor.getSelection();
+				await this.handleChallenge(selection);
+			}
+		});
 		
 		// obsidian's cache api is literally a maze, need to remember to hook it up
 	}
@@ -41,5 +50,9 @@ export default class DebatePartnerPlugin extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
+	}
+
+	async handleChallenge(thesis_junk: string) {
+		console.log("handling debate challenge for:", thesis_junk);
 	}
 }
