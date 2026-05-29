@@ -44,6 +44,22 @@ export class DebatePartnerView extends ItemView {
 
 		baseDiv.createEl("blockquote", { text: this.thesis });
 		baseDiv.createEl("h4", { text: "Counterarguments" });
+
+		const listDiv = baseDiv.createEl("div", { cls: "debate-arguments-list" });
+		for (const arg of this.arguments) {
+			const itemDiv = listDiv.createEl("div", { cls: "debate-argument-item" });
+			
+			const headerDiv = itemDiv.createEl("div", { cls: "debate-argument-header" });
+			headerDiv.createEl("span", { 
+				text: arg.severity.toUpperCase(), 
+				cls: `debate-severity debate-severity-${arg.severity.toLowerCase()}` 
+			});
+
+			const textP = itemDiv.createEl("p", { 
+				text: arg.argument,
+				cls: "debate-argument-text" 
+			});
+		}
 	}
 
 	async onClose() {
