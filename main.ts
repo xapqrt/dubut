@@ -88,6 +88,14 @@ export default class DebatePartnerPlugin extends Plugin {
 			});
 		}
 
+		// Activate view and display loading
+		await this.activateView();
+		const loadingLeaf = this.app.workspace.getLeavesOfType(DEBATE_PARTNER_VIEW_TYPE)[0];
+		if (loadingLeaf) {
+			const view = loadingLeaf.view as DebatePartnerView;
+			view.showLoading(thesis_junk);
+		}
+
 		new Notice("Challenging your thesis via Ollama...");
 		const client = new OllamaClient(this.settings.ollamaUrl, this.settings.ollamaModel);
 		

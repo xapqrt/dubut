@@ -95,14 +95,23 @@ export class TfidfEngine {
 		const allDocsTokens: string[][] = [];
 		const docFiles: TFile[] = [];
 
-		// Read and tokenize all files
-		for (const file of files) {
-			try {
-				const content = await this.app.vault.cachedRead(file);
-				allDocsTokens.push(this.tokenize(content));
-				docFiles.push(file);
-			} catch (e) {
-				// obsidian's cache api is literally a maze, skipping file
+		// Read and tokenize all files in parallel
+		const readResults = await Promise.all(
+			files.map(async (file) => {
+				try {
+					const content = await this.app.vault.cachedRead(file);
+					return { file, tokens: this.tokenize(content) };
+				} catch (e) {
+					// obsidian's cache api is literally a maze, skipping file
+					return null;
+				}
+			})
+		);
+
+		for (const res of readResults) {
+			if (res) {
+				allDocsTokens.push(res.tokens);
+				docFiles.push(res.file);
 			}
 		}
 

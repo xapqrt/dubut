@@ -10,6 +10,7 @@ export interface DebateArgument {
 export class DebatePartnerView extends ItemView {
 	private thesis: string = "";
 	private arguments: DebateArgument[] = [];
+	private isLoading: boolean = false;
 
 	constructor(leaf: WorkspaceLeaf) {
 		super(leaf);
@@ -23,10 +24,19 @@ export class DebatePartnerView extends ItemView {
 		return "Debate Partner";
 	}
 
+	// Show loading indicator
+	public showLoading(thesis: string) {
+		this.thesis = thesis;
+		this.arguments = [];
+		this.isLoading = true;
+		this.onOpen();
+	}
+
 	// Update the content of the view
 	public updateArguments(thesis: string, args: DebateArgument[]) {
 		this.thesis = thesis;
 		this.arguments = args;
+		this.isLoading = false;
 		this.onOpen(); // trigger redraw
 	}
 
@@ -44,6 +54,13 @@ export class DebatePartnerView extends ItemView {
 
 		baseDiv.createEl("blockquote", { text: this.thesis });
 		baseDiv.createEl("h4", { text: "Counterarguments" });
+
+		if (this.isLoading) {
+			const loadingDiv = baseDiv.createEl("div", { cls: "debate-loading-container" });
+			loadingDiv.createEl("div", { cls: "debate-spinner" });
+			loadingDiv.createEl("p", { text: "M4 local AI is cooking steel-man counterarguments..." });
+			return;
+		}
 
 		const listDiv = baseDiv.createEl("div", { cls: "debate-arguments-list" });
 		for (const arg of this.arguments) {
