@@ -133,3 +133,30 @@
 		transform: rotate(360deg);
 	}
 }
+
+.debate-pills-container {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	margin-top: 8px;
+}
+
+.debate-pill-tag {
+	display: inline-flex;
+	align-items: center;
+	background: var(--background-secondary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 12px;
+	padding: 4px 10px;
+	font-size: 0.8em;
+	color: var(--text-muted);
+	text-decoration: none !important;
+	transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.debate-pill-tag:hover {
+	background: var(--interactive-accent);
+	color: var(--text-on-accent);
+	border-color: var(--interactive-accent);
+	cursor: pointer;
+}

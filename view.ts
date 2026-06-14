@@ -11,6 +11,7 @@ export class DebatePartnerView extends ItemView {
 	private thesis: string = "";
 	private arguments: DebateArgument[] = [];
 	private isLoading: boolean = false;
+	private matchedNotes: string[] = [];
 
 	constructor(leaf: WorkspaceLeaf) {
 		super(leaf);
@@ -33,9 +34,10 @@ export class DebatePartnerView extends ItemView {
 	}
 
 	// Update the content of the view
-	public updateArguments(thesis: string, args: DebateArgument[]) {
+	public updateArguments(thesis: string, args: DebateArgument[], matchedNotes: string[] = []) {
 		this.thesis = thesis;
 		this.arguments = args;
+		this.matchedNotes = matchedNotes;
 		this.isLoading = false;
 		this.onOpen(); // trigger redraw
 	}
@@ -77,6 +79,21 @@ export class DebatePartnerView extends ItemView {
 				cls: "debate-argument-text" 
 			});
 			this.renderArgumentWithLinks(textP, arg.argument);
+		}
+
+		if (this.matchedNotes.length > 0) {
+			baseDiv.createEl("h4", { text: "Matched Vault Context" });
+			const pillsDiv = baseDiv.createEl("div", { cls: "debate-pills-container" });
+			for (const note of this.matchedNotes) {
+				const pillEl = pillsDiv.createEl("a", { 
+					text: `📄 ${note}`, 
+					cls: "debate-pill-tag internal-link" 
+				});
+				pillEl.addEventListener("click", async (e) => {
+					e.preventDefault();
+					await this.app.workspace.openLinkText(note, "", true);
+				});
+			}
 		}
 	}
 

@@ -1,7 +1,8 @@
-import { Plugin, Notice } from "obsidian";
+import { Plugin, Notice, PluginSettingTab, Setting, App } from "obsidian";
 import { TfidfEngine } from "./search";
 import { OllamaClient } from "./ollama";
 import { DebatePartnerView, DEBATE_PARTNER_VIEW_TYPE, DebateArgument } from "./view";
+
 
 interface DebatePartnerSettings {
 	ollamaUrl: string;
@@ -44,6 +45,8 @@ export default class DebatePartnerPlugin extends Plugin {
 				await this.handleChallenge(selection);
 			}
 		});
+
+		this.addSettingTab(new DebatePartnerSettingTab(this.app, this));
 		
 		// obsidian's cache api is literally a maze, need to remember to hook it up
 	}
@@ -109,7 +112,7 @@ export default class DebatePartnerPlugin extends Plugin {
 			const leaf = this.app.workspace.getLeavesOfType(DEBATE_PARTNER_VIEW_TYPE)[0];
 			if (leaf) {
 				const view = leaf.view as DebatePartnerView;
-				view.updateArguments(thesis_junk, args);
+				view.updateArguments(thesis_junk, args, matches.map(m => m.file.basename));
 			}
 		} catch (err) {
 			new Notice("Failed to communicate with Ollama. Is it running locally?");
@@ -168,5 +171,45 @@ export default class DebatePartnerPlugin extends Plugin {
 			argument: "Failed to parse Ollama response: " + raw_text.substring(0, 100) + "...",
 			severity: "Medium"
 		}];
+	}
+}
+
+class DebatePartnerSettingTab extends PluginSettingTab {
+	plugin: DebatePartnerPlugin;
+
+	constructor(app: App, plugin: DebatePartnerPlugin) {
+		super(app, plugin);
+		this.plugin = plugin;
+	}
+
+	display(): void {
+		const { containerEl } = this;
+		containerEl.empty();
+
+		new Setting(containerEl)
+			.setName("Ollama URL")
+			.setDesc("The local endpoint where Ollama is running.")
+			.addText((text) =>
+				text
+					.setPlaceholder("http://localhost:11434")
+					.setValue(this.plugin.settings.ollamaUrl)
+					.onChange(async (value) => {
+						this.plugin.settings.ollamaUrl = value;
+						await this.plugin.saveSettings();
+					})
+			);
+
+		new Setting(containerEl)
+			.setName("Ollama Model")
+			.setDesc("The local model to use for generating steel-man arguments.")
+			.addText((text) =>
+				text
+					.setPlaceholder("llama3")
+					.setValue(this.plugin.settings.ollamaModel)
+					.onChange(async (value) => {
+						this.plugin.settings.ollamaModel = value;
+						await this.plugin.saveSettings();
+					})
+			);
 	}
 }
